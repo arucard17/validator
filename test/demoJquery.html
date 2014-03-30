@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Test Validator jQuery</title>
+</head>
+<body>
+	<form id="forming" class="prueba">
+		<input type="text" name="password" id="password" placeholder="Ingresa la contraseña" /><br/>
+		<input type="text" name="password_confirmation" id="password_confirmation" placeholder="Ingrese de nuevo la contraseña" /><br/>
+		<button type="submit" >Registrar</button>
+	</form>
+
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="../validator.jquery.js"></script>
+
+	<script type="text/javascript">
+		$(function (){
+
+			var rules = {
+				'password' : 'required|min:6',
+				'password_confirmation' : 'required|password'
+/*				'fecha': 'required|regexp:^([0-9]{2}):([0-9]{2})$',
+				'email' : 'required|email',
+				'sexo' : 'required|max:1|in:F,M',
+				'cedula' : 'required|number' */
+			};
+
+			var msn = {
+				'required' : 'El campo es obligatorio.',
+				'password_confirmation.required': 'Debe ingresar la contraseña',
+				'password' : 'Las contraseñas no coinciden.',
+				'password.min' : 'La contraseña debe ser minimo de :min caracteres.',
+/*				
+				'email'		: 'El correo no es válido.',
+'number'	: 'El campo debe ser numerico.',
+				'nombre.required': 'Coloca tu puto nombre!',
+				'fecha.regexp': 'la fecha no es válida',
+				'nombre.min': 'el nombre debe ser minimo de :min caracteres.',
+				'sexo.max': 'el campo debe contener como maximo de :max caracter.',
+				'sexo.in': 'no se reconoce el sexo. debe seleccionar entre :1 o :2'
+*/			};
+
+			$('#forming').validator({
+				rules: rules,
+				messages: msn
+			});
+
+		});
+	</script>
+
+</body>
+</html>
+
