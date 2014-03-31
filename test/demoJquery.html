@@ -2,13 +2,82 @@
 <html>
 <head>
 	<title>Test Validator jQuery</title>
+
+	<!-- Styles Bootstrap -->
+	<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+	<style type="text/css" media="screen">
+		h2{
+			margin-bottom: -17px;
+			color: rgb(85, 85, 85);
+			margin-top: 34px;
+		}
+	</style>
 </head>
 <body>
-	<form id="forming" class="prueba">
-		<input type="text" name="password" id="password" placeholder="Ingresa la contraseña" /><br/>
-		<input type="text" name="password_confirmation" id="password_confirmation" placeholder="Ingrese de nuevo la contraseña" /><br/>
-		<button type="submit" >Registrar</button>
-	</form>
+
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8">
+				<form class="form-horizontal" role="form">
+					<h2>Personal Information</h2>
+					<hr>
+					<div class="form-group">
+						<label for="inputEmail3" class="col-sm-2 control-label">Name</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="name" name="name" placeholder="Name">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="inputEmail3" class="col-sm-2 control-label">Email</label>
+						<div class="col-sm-10">
+							<input type="email" class="form-control" id="email" name="email" placeholder="Email">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="inputEmail3" class="col-sm-2 control-label">Telephone</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="telephone" name="telephone" placeholder="Telephone">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="inputPassword3" class="col-sm-2 control-label">Sex</label>
+						<div class="col-sm-10">
+							<select name="sex"  class="form-control">
+								<option value="0">Select your sex</option>
+								<option value="F">Female</option>
+								<option value="M">Male</option>
+							</select>
+						</div>
+					</div>
+					<h2>User Information</h2>
+					<hr>
+					<div class="form-group">
+						<label for="username" class="col-sm-2 control-label">Username</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="username" name="username" placeholder="Username">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="password" class="col-sm-2 control-label">Password</label>
+						<div class="col-sm-10">
+							<input type="password" class="form-control" id="password" name="password" >
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="password_confirmation" class="col-sm-2 control-label">Repeat Password</label>
+						<div class="col-sm-10">
+							<input type="password" class="form-control" id="password_confirmation" name="password_confirmation" >
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-10">
+							<button type="submit" class="btn btn-default">Sign up</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
 
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 	<script type="text/javascript" src="../validator.jquery.js"></script>
@@ -17,33 +86,63 @@
 		$(function (){
 
 			var rules = {
+				'name' : 'required',
+				'email' : 'required|email',
+				'telephone' : 'required|number',
+				'sex'	: 'in:F,M',
+				'username' : 'required|min:3|max:8',
 				'password' : 'required|min:6',
 				'password_confirmation' : 'required|password'
-/*				'fecha': 'required|regexp:^([0-9]{2}):([0-9]{2})$',
-				'email' : 'required|email',
-				'sexo' : 'required|max:1|in:F,M',
-				'cedula' : 'required|number' */
 			};
 
 			var msn = {
-				'required' : 'El campo es obligatorio.',
-				'password_confirmation.required': 'Debe ingresar la contraseña',
-				'password' : 'Las contraseñas no coinciden.',
-				'password.min' : 'La contraseña debe ser minimo de :min caracteres.',
-/*				
-				'email'		: 'El correo no es válido.',
-'number'	: 'El campo debe ser numerico.',
-				'nombre.required': 'Coloca tu puto nombre!',
-				'fecha.regexp': 'la fecha no es válida',
-				'nombre.min': 'el nombre debe ser minimo de :min caracteres.',
-				'sexo.max': 'el campo debe contener como maximo de :max caracter.',
-				'sexo.in': 'no se reconoce el sexo. debe seleccionar entre :1 o :2'
-*/			};
+				'required' : 'The field is required.',
+				'password_confirmation.required': 'The field is required',
+				'password' : 'The password does not match.',
+				'password.min' : 'The password must be at least :min.',
+				'email'		: 'The email format is invalid.',
+				'telephone.number'	: 'The field must be a number.',
+				'username.min': 'The username must be at least :min.',
+				'username.max': 'The username may not be greater than :max characters.',
+				'sex.in': 'The selected sex is invalid.'
+			};
 
-			$('#forming').validator({
+
+			function setError($el, messages){
+				console.log($el);
+				$('.help-block', $el.parent()).remove();
+
+				// console.log($el,messages);
+				$el.parent().parent().addClass('has-error');
+				$el.after('<span class="help-block">'+ messages[0] +'</span>');
+
+			}
+
+			function setErrors(messages){
+				var $el ={};
+
+				// Clean Errors
+				$('.form-group').removeClass('has-error');
+				$('.help-block').remove();
+
+				for(var m in messages){
+					$el = $('[name='+m+']');
+					setError($el, messages[m]);
+				}
+			}
+
+			$('.form-horizontal').validator({
 				rules: rules,
-				messages: msn
+				messages: msn,
+				fail: setError,
+				failSubmit: setErrors,
+				success: function (){
+					alert('Success!');
+				}
 			});
+
+
+
 
 		});
 	</script>
