@@ -1,4 +1,4 @@
-/* =======================================================
+/* =====================================================================================
     * Plugin para la validación de los campos.
     *
     * The MIT License (MIT)
@@ -23,9 +23,8 @@
     * SOFTWARE.
     *
     * @autor @_cristianace
-    * @version 0.0.1
-    * @date 03 - 30 - 2014
-   =======================================================*/
+    * @version 0.0.3
+   ====================================================================================== */
 
 
 ;(function($, document, window, undefined) {
@@ -35,21 +34,11 @@
         var defaults = {
             rules: {},
             messages: {},
-            success: function (data){
-                console.log(this,data);
-                alert('correcto!');
-                this.submit();
-            },
-            fail: function ($el, messages){
-                console.log($el, messages);
-            },
-            done: function ($el){
+            success: function (data){},
+            fail: function ($el, messages){},
+            done: function ($el){},
+            failSubmit: function (messages){},
 
-            },
-            failSubmit: function (messages){
-                console.log(messages);
-            },
-    
             // Divisor entre validaciones definidas por campo ej. required|min:3
             reg : '\|'
         };
@@ -97,8 +86,6 @@
             ,'max': function(value, extras) {
                 max = parseInt(extras);
 
-                // console.log(value,extras);
-
                 if (!this.number(value))
                     return value.length <= max;
                 else {
@@ -120,14 +107,6 @@
                 var modifer = '',
                     reg = '';
 
-                // console.log(extras);
-                /*
-                if(extras.indexOf(',') != -1){
-                param = extras.split(',');
-                reg = param[0];
-                modifer = param[1];
-                }else{
-                }*/
                 reg = extras;
 
                 value += "";
@@ -207,9 +186,8 @@
             ,'password': function(pass, ex, data) {
                 return pass === data['password'];
             }
-
-
         };
+
 
         // Se establecen las opciones que quedan
         op = $.extend({}, defaults, opts);
@@ -218,16 +196,14 @@
         /* The Magic */
         return this.each(function() {
 
-            // Change Context
-            op.success = $.proxy(op.success, this);
-            op.fail = $.proxy(op.fail, this);
-            op.failSubmit = $.proxy(op.failSubmit, this);
-
             var $this = $(this),
                 data = {},
                 response = {};
 
-            update();
+            // Si las reglas no se definieron desde las opciones, intento obtenerlas desde el elemento en el DOM por medio del data-rules
+            if(Object.keys(op.rules).length <= 0){
+                op.rules = getRulesFromElements();
+            }
 
             // Valido las reglas enviadas por el usuario
             if (typeof op.rules !== 'object' && op.rules == null)
@@ -236,6 +212,14 @@
             // Valido las reglas enviadas por el usuario
             if (typeof op.messages !== 'object' && op.messages == null)
                 throw new Error('Error with messages submitted');
+
+
+            // Change Context
+            op.success = $.proxy(op.success, this);
+            op.fail = $.proxy(op.fail, this);
+            op.failSubmit = $.proxy(op.failSubmit, this);
+
+            update();
 
 
             // Form On Submit
@@ -269,9 +253,6 @@
                     _data = singleValide( data[index], ruls, mess)
 
                     if(_data.length > 0){
-/*                        if (!response[index])
-                            response[index] = [];
-                        */
                         response[index] =  _data;
                     }
 
@@ -286,9 +267,8 @@
                         op.success(data);
                     }
                 }
-
-
             }
+
 
             function update(){
                 data = serializeJSON();
@@ -336,8 +316,6 @@
                 return resp;
             }
 
-            
-
 
             function attachEvents () {
                 var $el = {};
@@ -375,6 +353,26 @@
             }
 
 
+            /**
+             * Función para obtener las reglas definidas en data-rules en cada 
+             * elemento del formulario
+             */
+            function getRulesFromElements(){
+                var elements = $this.serializeArray();
+                var rules = {};
+
+                for(var i in elements){
+                    $el = $('[name='+elements[i].name+']'); 
+                    if($el.length > 0){
+                        if($el.data('rules') !== undefined){
+                            rules[elements[i].name] = $el.data('rules');
+                        }
+                    }
+                }
+                return rules;
+            }
+
+
             /*
              * Función que extrae las reglas.
              *
@@ -382,8 +380,6 @@
              */
              
             function getRules(rules) {
-
-                // console.log(rules)
 
                 // Valido la información enviada
                 if (typeof rules !== 'string' && rules == null)
@@ -492,9 +488,6 @@
 
 
 
-
-
-
             /*
              * Función que retorna el resultado de la validación.
              *
@@ -555,3 +548,4 @@
     }
 
 })(jQuery, document, window, undefined);
+

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Test Validator jQuery</title>
+
+	<!-- Styles Bootstrap -->
+	<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+	<style type="text/css" media="screen">
+		h2{
+			margin-bottom: -17px;
+			color: rgb(85, 85, 85);
+			margin-top: 34px;
+		}
+	</style>
+</head>
+<body>
+
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8">
+				<form class="form-horizontal" role="form">
+					<h2>Personal Information</h2>
+					<hr>
+					<div class="form-group">
+						<label for="name" class="col-sm-2 control-label">Name</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="name" name="name" placeholder="Name" data-rules="required">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="email" class="col-sm-2 control-label">Email</label>
+						<div class="col-sm-10">
+							<input type="email" class="form-control" id="email" name="email" placeholder="Email" data-rules="required|email">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="telephone" class="col-sm-2 control-label">Telephone</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="telephone" name="telephone" placeholder="Telephone" data-rules="required|number">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="sex" class="col-sm-2 control-label">Sex</label>
+						<div class="col-sm-10">
+							<select name="sex" id="sex" class="form-control" data-rules="in:F,M">
+								<option value="0">Select your sex</option>
+								<option value="F">Female</option>
+								<option value="M">Male</option>
+							</select>
+						</div>
+					</div>
+
+
+					<h2>User Information</h2>
+					<hr>
+					<div class="form-group">
+						<label for="username" class="col-sm-2 control-label">Username</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="username" name="username" placeholder="Username" data-rules="required|min:3|max:8">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="password" class="col-sm-2 control-label">Password</label>
+						<div class="col-sm-10">
+							<input type="password" class="form-control" id="password" name="password" data-rules="required|min:6" >
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="password_confirmation" class="col-sm-2 control-label">Repeat Password</label>
+						<div class="col-sm-10">
+							<input type="password" class="form-control" id="password_confirmation" name="password_confirmation"  data-rules="required|password">
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-10">
+							<button type="submit" class="btn btn-default">Sign up</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="../validator.jquery.js"></script>
+
+	<script type="text/javascript">
+		$(function (){
+
+			var msn = {
+				'required' : 'The field is required.',
+				'password_confirmation.required': 'The field is required',
+				'password' : 'The password does not match.',
+				'password.min' : 'The password must be at least :min.',
+				'email'		: 'The email format is invalid.',
+				'telephone.number'	: 'The field must be a number.',
+				'username.min': 'The username must be at least :min.',
+				'username.max': 'The username may not be greater than :max characters.',
+				'sex.in': 'The selected sex is invalid.',
+			};
+
+
+			function setError($el, messages){
+
+				// Clean Error
+				removeError($el);
+
+				// console.log($el,messages);
+				$el.parent().parent().addClass('has-error');
+				$el.after('<span class="help-block">'+ messages[0] +'</span>');
+
+			}
+
+			function setErrors(messages){
+				var $el ={};
+
+				// Clean Errors
+				$('.form-group').removeClass('has-error');
+				$('.help-block').remove();
+
+				for(var m in messages){
+					$el = $('[name='+m+']');
+					setError($el, messages[m]);
+				}
+			}
+
+			function removeError($el){
+				$el.parent().parent().removeClass('has-error');
+				$('.help-block', $el.parent()).remove();
+			}
+
+			$('.form-horizontal').validator({
+				messages: msn,
+				fail: setError,
+				done: removeError,
+				failSubmit: setErrors,
+				success: function (){
+					alert('Success!');
+				}
+			});
+
+
+
+
+		});
+	</script>
+
+</body>
+</html>
+
