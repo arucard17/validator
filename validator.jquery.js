@@ -340,8 +340,14 @@
 
 
             function attachEvents () {
+                var $el = {};
                  for(var i in  data){
-                    $('[name='+ i +']', $this).on('blur', onBlurElement);
+                    $el = $('[name='+ i +']', $this);
+                    if($el.is('input') || $el.is('textarea')){
+                        $el.on('blur', onBlurElement);
+                    } else if($el.is('select')){
+                        $el.on('change', onBlurElement);
+                    }
                 }
             }
 
