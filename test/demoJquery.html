@@ -109,8 +109,9 @@
 
 
 			function setError($el, messages){
-				console.log($el);
-				$('.help-block', $el.parent()).remove();
+
+				// Clean Error
+				removeError($el);
 
 				// console.log($el,messages);
 				$el.parent().parent().addClass('has-error');
@@ -131,10 +132,16 @@
 				}
 			}
 
+			function removeError($el){
+				$el.parent().parent().removeClass('has-error');
+				$('.help-block', $el.parent()).remove();
+			}
+
 			$('.form-horizontal').validator({
 				rules: rules,
 				messages: msn,
 				fail: setError,
+				done: removeError,
 				failSubmit: setErrors,
 				success: function (){
 					alert('Success!');
