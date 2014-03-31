@@ -43,6 +43,9 @@
             fail: function ($el, messages){
                 console.log($el, messages);
             },
+            done: function ($el){
+
+            },
             failSubmit: function (messages){
                 console.log(messages);
             },
@@ -359,6 +362,9 @@
                 if( _mess.length > 0 ){
                     if(typeof op.fail == 'function')
                         op.fail($el, _mess);
+                }else{
+                    if(typeof op.done == 'function')
+                        op.done($el);
                 }
             }
 
