@@ -23,7 +23,7 @@
     * SOFTWARE.
     *
     * @autor @_cristianace
-    * @version 0.0.3
+    * @version 0.0.4
    ====================================================================================== */
 
 
@@ -39,12 +39,29 @@
             done: function ($el){},
             failSubmit: function (messages){},
 
-            // Divisor entre validaciones definidas por campo ej. required|min:3
+            // Divisor de validaciones definidas por campo ej. required|min:3
             reg : '\|'
         };
 
-        /*  Funciones de validación */
-        defaults.functions = {
+       /**
+        * Funciones de validación
+        *
+        * Para extender las funciones y querer usar las nuestras propias, se debe definir de la siguiente forma:
+        * En la configuración de nuestro plugin se debe agregar un atributo funciones de tipo objeto y en el 
+        * colocar las funciones que queremos usar para nuestra validación, el plugin lo que hace es unir las 
+        * funciones, si hay una con el mismo nombre se reemplaza, teniendo como prioridad la del usuario.
+        * e.j.
+        *   $('.form-horizontal').validator({
+        *       functions: {
+        *           dash: function (value, extras, data){
+        *               exp = new RegExp('^([a-zA-Z0-9_]+)$');
+        *               return exp.exec(value) ? true : false;
+        *           }
+        *      },
+        *      ....
+        * 
+        */
+        var functions = {
 
             /*
              * Función que valida si está vacío.
@@ -166,12 +183,12 @@
 
 
             /*
-             * Función que valida si el valor no está dentro de los valores pasados por parametro.
+             * Función que valida si el valor no está dentro de los valores pasados por parametro. Depende de la función in
              *
              * @return boolean, true si no lo está, false si lo está
              */
             ,'not_in': function(value, extras) {
-                return !this. in (value, extras);
+                return !this.in(value, extras);
             }
 
 
@@ -181,17 +198,35 @@
              * @param pass, la contraseña enviada
              * @param pass_conf, la contraseña de confirmación con la que se debe comparar
              *
-             * @return boolean, true si no son iguales, false si lo son
+             * @return boolean, true si son iguales, false si no lo son
              */
-            ,'password': function(pass, ex, data) {
-                return pass === data['password'];
+            ,'password': function(value, extras, data) {
+                return value === data['password'];
             }
+
+            /**
+             * Función que valida el tamaño minimo y maximo de una cadena.
+             * @param  {String} value
+             * @param  {String} extras
+             * @param  {Array} data
+             * @return {boolean} true si está dentro del limite y false si no lo está
+             */
+            ,'between': function(value, extras, data) {
+                extras = extras.split(',');
+                if(extras.length == 2)
+                    return this.min(value, extras[0]) && this.max(value,extras[1]);
+                else
+                    return false;
+            }
+
         };
 
 
-        // Se establecen las opciones que quedan
+        // Se establecen las opciones que quedan para iniciar la validación
         op = $.extend({}, defaults, opts);
 
+        // Si se definieron Funciones, amplio las existentes con las definidas por el usuario
+        op.functions = $.extend({}, functions, opts.functions);
 
         /* The Magic */
         return this.each(function() {
@@ -321,16 +356,16 @@
                 var $el = {};
                  for(var i in  data){
                     $el = $('[name='+ i +']', $this);
+                    $el.on('change', onChangeElement);
+
                     if($el.is('input') || $el.is('textarea')){
-                        $el.on('blur', onBlurElement);
-                    } else if($el.is('select')){
-                        $el.on('change', onBlurElement);
-                    }
+                        $el.on('blur', onChangeElement);
+                    } 
                 }
             }
 
 
-            function onBlurElement(e){
+            function onChangeElement(e){
                 
                 var $el = $(e.currentTarget),
                     name = $el.attr('name');
