@@ -92,16 +92,17 @@
 				'email' : 'required|email',
 				'telephone' : 'required|number',
 				'sex'	: 'in:F,M',
-				'username' : 'required|min:3|max:8',
-				'password' : 'required|min:6',
-				'password_confirmation' : 'required|password'
+				'username' : 'required|between:3,8',
+				'password' : 'required|min:6|dash',
+				'password_confirmation' : 'required|password',
 			};
 
 			var msn = {
 				'required' : 'The field is required.',
-				'password_confirmation.required': 'The field is required',
+				'password_confirmation.required': 'The password field is required',
 				'password' : 'The password does not match.',
-				'password.min' : 'The password must be at least :min.',
+				'password.dash' : 'Your password mut be alphanumeric with underscore',
+				'username.between' : 'The username must have a size between :1 and :2 characters.',
 				'email'		: 'The email format is invalid.',
 				'telephone.number'	: 'The field must be a number.',
 				'username.min': 'The username must be at least :min.',
@@ -140,13 +141,29 @@
 			}
 
 			$('.form-horizontal').validator({
+				// Extended Functions
+				functions: {
+					dash: function (value, extras, data){
+					    exp = new RegExp('^([a-zA-Z0-9_]+)$');
+						return exp.exec(value) ? true : false;
+					}
+				},
 				rules: rules,
 				messages: msn,
+
+				// Function for single error
 				fail: setError,
+
+				// Function for single field valide
 				done: removeError,
+
+				// Function when form is no valid
 				failSubmit: setErrors,
+
+				// Function success, form is valid
 				success: function (){
 					alert('Success!');
+					// this.submit();
 				}
 			});
 
